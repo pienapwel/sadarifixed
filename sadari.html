@@ -51,6 +51,10 @@
       text-align: center;
     }
 
+    .day-names {
+      font-weight: bold;
+    }
+
     .red-day {
       color: red;
       font-weight: bold;
@@ -86,6 +90,23 @@
       right: -40px;
     }
 
+    .media-container {
+      display: flex;
+      flex-direction: row;
+      justify-content: center;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .gif-media {
+      order: -1;
+      margin-right: 20px;
+    }
+
+    .png-media {
+      order: 1;
+    }
+
     .media-container img {
       max-width: 300px;
       margin: 10px;
@@ -113,7 +134,13 @@
     <div class="calendar-wrapper">
       <button class="nav-button prev" onclick="prevMonth()">&lt;</button>
       <div class="calendar" id="calendar">
-        <!-- Tanggal akan di-generate oleh JavaScript -->
+        <div class="day-names">Sen</div>
+        <div class="day-names">Sel</div>
+        <div class="day-names">Rab</div>
+        <div class="day-names">Kam</div>
+        <div class="day-names">Jum</div>
+        <div class="day-names">Sab</div>
+        <div class="day-names">Min</div>
       </div>
       <button class="nav-button next" onclick="nextMonth()">&gt;</button>
     </div>
@@ -127,7 +154,6 @@
     <source src="media/sadari.mp3" type="audio/mpeg">
   </audio>
 
-  <!-- Ganti button play dengan logo musik -->
   <div id="musicIcon">&#127925;</div>
 
   <script>
@@ -139,15 +165,15 @@
     const mediaFiles = {
       "Januari": ["JANUARI.png"],
       "Februari": ["FEBRUARY.png"],
-      "Maret": ["MARCH.png", "MARCH MEDIA.png"],
-      "April": ["APRIL.png", "APRIL MEDIA.png"],
+      "Maret": ["MARCH MEDIA.png", "MARCH.png"],
+      "April": ["APRIL MEDIA.png", "APRIL.png"],
       "Mei": ["MAY.png", "MAY MEDIA.gif"],
       "Juni": ["JUNE.png", "JUNE MEDIA.gif"],
       "Juli": ["JULY.png", "JULY MEDIA.gif"],
       "Agustus": ["AUGUST.png", "AUGUST MEDIA.gif"],
       "September": ["SEPTEMBER.png", "SEPTEMBER MEDIA.gif"],
       "Oktober": ["OCTOBER.png", "OCTOBER MEDIA.gif"],
-      "November": ["NOVEMBER.png", "NOVEMBER MEDIA.png"],
+      "November": ["NOVEMBER MEDIA.png", "NOVEMBER.png"],
       "Desember": ["DESEMBER.png"]
     };
 
@@ -180,8 +206,15 @@
 
       monthYear.innerText = `${months[currentMonth]} ${currentYear}`;
 
-      calendar.innerHTML = ""; // Hapus isi kalender sebelumnya
-      mediaContainer.innerHTML = ""; // Hapus media sebelumnya
+      // Tambahkan elemen hari ke kalender
+      const dayNames = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+      calendar.innerHTML = "";  // Clear kalender
+      dayNames.forEach(day => {
+        const dayElement = document.createElement("div");
+        dayElement.classList.add("day-names");
+        dayElement.innerText = day;
+        calendar.appendChild(dayElement);
+      });
 
       const firstDay = new Date(currentYear, currentMonth, 1).getDay();
       const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
@@ -208,12 +241,21 @@
         calendar.appendChild(dayCell);
       }
 
-      let mediaFilesForMonth = mediaFiles[months[currentMonth]];
+      // Menampilkan media sesuai bulan
+      mediaContainer.innerHTML = ""; // Clear mediaContainer
+      const mediaFilesForMonth = mediaFiles[months[currentMonth]];
       if (mediaFilesForMonth) {
         mediaFilesForMonth.forEach(file => {
           let mediaElement = document.createElement("img");
-          mediaElement.src = `media/${file}`;  // Update path to relative if it's hosted on the same server
+          mediaElement.src = `media/${file}`;  // Update path ke relative jika file ada di folder yang sama
           mediaElement.alt = file;
+
+          if (file.endsWith(".gif")) {
+            mediaElement.classList.add("gif-media");
+          } else if (file.endsWith(".png")) {
+            mediaElement.classList.add("png-media");
+          }
+
           mediaContainer.appendChild(mediaElement);
         });
       }
