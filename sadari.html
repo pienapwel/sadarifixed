@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kalender SADARI 2025</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background-color: #fff;
+      margin: 20px;
+    }
+
+    .calendar-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin-top: 50px;
+      position: relative;
+    }
+
+    .month-title {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+
+    .calendar-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .calendar {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+      max-width: 400px;
+      border: 2px solid #e91e63;
+      padding: 10px;
+      border-radius: 10px;
+    }
+
+    .calendar div {
+      padding: 10px;
+      border: 1px solid #e91e63;
+      text-align: center;
+    }
+
+    .red-day {
+      color: red;
+      font-weight: bold;
+    }
+
+    .today {
+      background-color: #fe0098;
+      color: white;
+      font-weight: bold;
+      border-radius: 5px;
+    }
+
+    .nav-button {
+      background: none;
+      border: none;
+      font-size: 30px;
+      cursor: pointer;
+      color: #e91e63;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .nav-button:hover {
+      color: #d81b60;
+    }
+
+    .prev {
+      left: -40px;
+    }
+
+    .next {
+      right: -40px;
+    }
+
+    .media-container img {
+      max-width: 300px;
+      margin: 10px;
+      border-radius: 10px;
+    }
+
+    #musicIcon {
+      margin-top: 20px;
+      font-size: 40px;
+      cursor: pointer;
+      color: #fe0098;
+    }
+
+    #musicIcon:hover {
+      color: #d81b60;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="calendar-container">
+    <div class="month-title" id="monthYear">Januari 2025</div>
+
+    <div class="calendar-wrapper">
+      <button class="nav-button prev" onclick="prevMonth()">&lt;</button>
+      <div class="calendar" id="calendar">
+        <!-- Tanggal akan di-generate oleh JavaScript -->
+      </div>
+      <button class="nav-button next" onclick="nextMonth()">&gt;</button>
+    </div>
+  </div>
+
+  <div class="media-container" id="mediaContainer">
+    <!-- Media akan ditampilkan di sini -->
+  </div>
+
+  <audio id="sadariMusic">
+    <source src="media/sadari.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Ganti button play dengan logo musik -->
+  <div id="musicIcon">&#127925;</div>
+
+  <script>
+    const months = [
+      "Januari", "Februari", "Maret", "April", "Mei", "Juni",
+      "Juli", "Agustus", "September", "Oktober", "November", "Desember"
+    ];
+
+    const mediaFiles = {
+      "Januari": ["JANUARI.png"],
+      "Februari": ["FEBRUARY.png"],
+      "Maret": ["MARCH.png", "MARCH MEDIA.png"],
+      "April": ["APRIL.png", "APRIL MEDIA.png"],
+      "Mei": ["MAY.png", "MAY MEDIA.gif"],
+      "Juni": ["JUNE.png", "JUNE MEDIA.gif"],
+      "Juli": ["JULY.png", "JULY MEDIA.gif"],
+      "Agustus": ["AUGUST.png", "AUGUST MEDIA.gif"],
+      "September": ["SEPTEMBER.png", "SEPTEMBER MEDIA.gif"],
+      "Oktober": ["OCTOBER.png", "OCTOBER MEDIA.gif"],
+      "November": ["NOVEMBER.png", "NOVEMBER MEDIA.png"],
+      "Desember": ["DESEMBER.png"]
+    };
+
+    const redDays = {
+      "Januari": [1],
+      "Februari": [28],
+      "Maret": [31],
+      "April": [18, 19],
+      "Mei": [1, 15, 25, 26],
+      "Juni": [5, 6],
+      "Juli": [7],
+      "Agustus": [17],
+      "September": [24],
+      "Oktober": [],
+      "November": [],
+      "Desember": [25]
+    };
+
+    let currentMonth = new Date().getMonth(); // Bulan saat ini
+    let currentYear = 2025; // Tahun tetap 2025
+    let todayDate = new Date().getDate();
+    let todayMonth = new Date().getMonth(); // Untuk cek apakah bulan kalender adalah bulan ini
+
+    let isPlaying = false;  // Variabel untuk melacak status musik
+
+    function renderCalendar() {
+      const calendar = document.getElementById("calendar");
+      const monthYear = document.getElementById("monthYear");
+      const mediaContainer = document.getElementById("mediaContainer");
+
+      monthYear.innerText = `${months[currentMonth]} ${currentYear}`;
+
+      calendar.innerHTML = ""; // Hapus isi kalender sebelumnya
+      mediaContainer.innerHTML = ""; // Hapus media sebelumnya
+
+      const firstDay = new Date(currentYear, currentMonth, 1).getDay();
+      const daysInMonth = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      for (let i = 0; i < firstDay; i++) {
+        let emptyCell = document.createElement("div");
+        calendar.appendChild(emptyCell);
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        let dayCell = document.createElement("div");
+        dayCell.innerText = day;
+
+        // Warna merah untuk tanggal libur nasional
+        if (redDays[months[currentMonth]].includes(day)) {
+          dayCell.classList.add("red-day");
+        }
+
+        // Highlight warna biru untuk tanggal hari ini jika bulan cocok
+        if (currentMonth === todayMonth && day === todayDate) {
+          dayCell.classList.add("today");
+        }
+
+        calendar.appendChild(dayCell);
+      }
+
+      let mediaFilesForMonth = mediaFiles[months[currentMonth]];
+      if (mediaFilesForMonth) {
+        mediaFilesForMonth.forEach(file => {
+          let mediaElement = document.createElement("img");
+          mediaElement.src = `media/${file}`;  // Update path to relative if it's hosted on the same server
+          mediaElement.alt = file;
+          mediaContainer.appendChild(mediaElement);
+        });
+      }
+    }
+
+    function prevMonth() {
+      if (currentMonth > 0) {
+        currentMonth--;
+      } else {
+        currentMonth = 11;
+      }
+      renderCalendar();
+    }
+
+    function nextMonth() {
+      if (currentMonth < 11) {
+        currentMonth++;
+      } else {
+        currentMonth = 0;
+      }
+      renderCalendar();
+    }
+
+    // Fungsi untuk play/pause musik
+    document.getElementById("musicIcon").addEventListener("click", function () {
+      let sadariMusic = document.getElementById("sadariMusic");
+
+      if (isPlaying) {
+        sadariMusic.pause();  // Pause musik
+        isPlaying = false;
+      } else {
+        sadariMusic.play();  // Play musik
+        isPlaying = true;
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", renderCalendar);
+  </script>
+
+</body>
+
+</html>
